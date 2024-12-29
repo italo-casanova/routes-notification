@@ -23,12 +23,14 @@ public class PoiServiceImp implements PoiService {
             .getCollection("points_of_interest");
     }
 
+    @Override
     public List<PointOfInterest> getAllPois() {
         return StreamSupport.stream(poiCollection.find().spliterator(), false)
                 .map(this::toPoi)
                 .collect(Collectors.toList());
     }
 
+    @Override
     public PointOfInterest getPoiById(String id) {
         Document document = poiCollection.find(Filters.eq("_id", id)).first();
         if (document != null) {
