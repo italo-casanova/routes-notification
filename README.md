@@ -1,70 +1,108 @@
-# real-time-notifications
+# **Real-Time Notifications**
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+Real-Time Notifications is a Java-based application built with **Quarkus**, the Supersonic Subatomic Java Framework. This project is designed to provide location-based notifications for travel agencies. It processes real-time location updates and notifies users when they are near points of interest (POIs), intermediate spots, or their destination.
 
-If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
+## **Overview**
 
-## Running the application in dev mode
+The application uses the following key features:
+- **Apache Kafka**: Handles real-time streaming of location updates.
+- **MongoDB**: Stores route data, including user-specific routes and intermediate spots.
+- **REST API**: Provides endpoints for integration and testing.
+- **SmallRye OpenAPI**: Documents the REST APIs with an interactive Swagger UI.
+- **Quarkus Scheduler**: Executes scheduled tasks, if needed for maintenance or batch operations.
 
-You can run your application in dev mode that enables live coding using:
+---
 
-```shell script
+## **Getting Started**
+
+### **Running the Application in Dev Mode**
+
+Run the application in development mode with live coding enabled:
+
+```bash
 ./mvnw quarkus:dev
+
+Note: Access the Quarkus Dev UI at http://localhost:8080/q/dev/ to manage your application during development.
 ```
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
+## Kafka Setup
 
-## Packaging and running the application
+Ensure Apache Kafka is running locally or remotely. Update the application.properties file to configure Kafka broker settings:
 
-The application can be packaged using:
+```properties
+kafka.bootstrap.servers=localhost:9092
+```
 
-```shell script
+## Start Kafka services before running the application.
+
+Packaging and Running the Application
+
+Package the application into a JAR file:
+
+```bash
 ./mvnw package
 ```
 
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
+## APIs and Endpoints
 
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
+### REST API
 
-If you want to build an _über-jar_, execute the following command:
+Location Update Endpoint: Submit real-time location updates for processing.
 
-```shell script
-./mvnw package -Dquarkus.package.jar.type=uber-jar
+```SH
+    POST /locations/update
+    Content-Type: application/json
+    Body: {
+        "userId": "user123",
+        "latitude": 40.782900,
+        "longitude": -73.965400
+    }
+
 ```
 
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
+### Swagger UI
 
-## Creating a native executable
+View and test the APIs interactively: http://localhost:8080/q/swagger-ui/
+Data Requirements
+MongoDB Collections
+Routes Collection
 
-You can create a native executable using:
+    Stores user-specific routes, including source, destination, and intermediate spots.
 
-```shell script
-./mvnw package -Dnative
+Example document:
+
+```json
+{
+    "_id": "64abcde1234f567890abcdef",
+    "userId": "user123",
+    "source": {
+        "type": "Point",
+        "coordinates": [-77.02824, -12.04318]
+    },
+    "destination": {
+        "type": "Point",
+        "coordinates": [-77.042793, -12.046374]
+    },
+    "intermediateSpots": [
+        { "name": "Spot A", "coordinates": [-77.035, -12.045] },
+        { "name": "Spot B", "coordinates": [-77.0365, -12.047] }
+    ]
+}
+
+Points of Interest Collection
+
+    Stores globally relevant points of interest.
+
+Example document:
+
+{
+    "_id": "64poi1234f567890abcdef",
+    "name": "Central Park",
+    "location": {
+        "type": "Point",
+        "coordinates": [-73.965355, 40.782865]
+    },
+    "description": "A large public park in New York City, USA.",
+    "category": "Park"
+}
 ```
-
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
-
-```shell script
-./mvnw package -Dnative -Dquarkus.native.container-build=true
-```
-
-You can then execute your native executable with: `./target/real-time-notifications-1.0.0-SNAPSHOT-runner`
-
-If you want to learn more about building native executables, please consult <https://quarkus.io/guides/maven-tooling>.
-
-## Related Guides
-
-- Apache Kafka Client ([guide](https://quarkus.io/guides/kafka)): Connect to Apache Kafka with its native API
-- Scheduler ([guide](https://quarkus.io/guides/scheduler)): Schedule jobs and tasks
-- SmallRye OpenAPI ([guide](https://quarkus.io/guides/openapi-swaggerui)): Document your REST APIs with OpenAPI - comes with Swagger UI
-- RESTEasy Reactive ([guide](https://quarkus.io/guides/resteasy-reactive)): A Jakarta REST implementation utilizing build time processing and Vert.x. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it.
-- MongoDB client ([guide](https://quarkus.io/guides/mongodb)): Connect to MongoDB in either imperative or reactive style
-
-## Provided Code
-
-### REST
-
-Easily start your REST Web Services
-
-[Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
