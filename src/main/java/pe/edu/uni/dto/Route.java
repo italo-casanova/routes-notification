@@ -1,5 +1,6 @@
 package pe.edu.uni.dto;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class Route {
@@ -7,11 +8,13 @@ public class Route {
     private String userId;
     private GeoJsonPoint source;
     private GeoJsonPoint destination;
-    private List<GeoJsonPoint> intermediateSpots;
+    private List<HashMap<String, GeoJsonPoint>> intermediateSpots;
 
-    public Route() {}
+    public Route() {
+    }
 
-    public Route(String id, String userId, GeoJsonPoint source, GeoJsonPoint destination, List<GeoJsonPoint> intermediateSpots) {
+    public Route(String id, String userId, GeoJsonPoint source, GeoJsonPoint destination,
+            List<HashMap<String, GeoJsonPoint>> intermediateSpots) {
         this.id = id;
         this.userId = userId;
         this.source = source;
@@ -51,11 +54,11 @@ public class Route {
         this.destination = destination;
     }
 
-    public List<GeoJsonPoint> getIntermediateSpots() {
+    public List<HashMap<String, GeoJsonPoint>> getIntermediateSpots() {
         return intermediateSpots;
     }
 
-    public void setIntermediateSpots(List<GeoJsonPoint> intermediateSpots) {
+    public void setIntermediateSpots(List<HashMap<String, GeoJsonPoint>> intermediateSpots) {
         this.intermediateSpots = intermediateSpots;
     }
 }

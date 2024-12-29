@@ -2,14 +2,16 @@ package pe.edu.uni.notification;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-
+import pe.edu.uni.dto.GeoJsonPoint;
 import pe.edu.uni.dto.LocationUpdate;
-import pe.edu.uni.dto.Route;
 import pe.edu.uni.service.NotificationService;
+import pe.edu.uni.service.PoiService;
 import pe.edu.uni.service.RouteService;
+import pe.edu.uni.dto.Route;
 
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.jboss.logging.Logger;
+
 
 @ApplicationScoped
 public class LocationConsumer {
@@ -22,43 +24,63 @@ public class LocationConsumer {
     @Inject
     RouteService routeService;
 
+    @Inject
+    PoiService poiService;
+
     @Incoming("location-updates")
     public void processLocationUpdate(LocationUpdate update) {
         LOG.infof("Received location update: %s", update);
 
-        // Retrieve the route and POIs for the user
-    //     Route route = routeService.getRouteForUser(update.getUserId());
-    //     if (route == null) {
-    //         LOG.warnf("No route found for user %s", update.getUserId());
-    //         return;
-    //     }
-    //
-    //     // Check proximity to POIs and destination
-    //     for (PointOfInterest poi : route.getPointsOfInterest()) {
-    //         if (isNear(update.getLatitude(), update.getLongitude(), poi.getLatitude(), poi.getLongitude())) {
-    //             notificationService.sendNotification(update.getUserId(), "You're near " + poi.getName());
-    //         }
-    //     }
-    //
-    //     // Check proximity to destination
-    //     if (isNear(update.getLatitude(), update.getLongitude(), route.getDestinationLat(), route.getDestinationLon())) {
-    //         notificationService.sendNotification(update.getUserId(), "You've reached your destination!");
-    //     }
+        // Notify for nearby POIs
+        notifyIfNearPois(update);
+
+        // Retrieve the user's route
+        Route route = routeService.getRouteForUser(update.getUserId());
+        if (route == null) {
+            LOG.warnf("No route found for user %s", update.getUserId());
+            return;
+        }
+
+        notifyIfNearIntermediateSpots(update, route);
+
+        notifyIfNearDestination(update, route);
     }
 
+    private void notifyIfNearPois(LocationUpdate update) {
+        poiService.getAllPois().stream()
+                .filter(poi -> isNear(update.getLatitude(), update.getLongitude(), poi.getCoordinates()[1], poi.getCoordinates()[0]))
+                .forEach(poi -> notificationService.sendNotification(update.getUserId(), "You're near " + poi.getName()));
+    }
+
+    private void notifyIfNearIntermediateSpots(LocationUpdate update, Route route) {
+        route.getIntermediateSpots().stream()
+                .flatMap(map -> map.values().stream())
+                .filter(spot -> isNear(update.getLatitude(), update.getLongitude(), spot.getLatitude(), spot.getLongitude())) // GeoJsonPoint: Y = latitude, X = longitude
+                .forEach(spot -> notificationService.sendNotification(update.getUserId(), "You're near an intermediate spot!"));
+    }
+
+    private void notifyIfNearDestination(LocationUpdate update, Route route) {
+        GeoJsonPoint destination = route.getDestination();
+        if (destination != null && isNear(update.getLatitude(), update.getLongitude(), destination.getLatitude(), destination.getLongitude())) {
+            notificationService.sendNotification(update.getUserId(), "You've reached your destination!");
+        }
+    }
+
+    // Helper method to determine proximity using the Haversine formula
     private boolean isNear(double lat1, double lon1, double lat2, double lon2) {
         double distance = haversine(lat1, lon1, lat2, lon2);
-        return distance <= 0.5;
+        return distance <= 0.5; // Within 500 meters
     }
 
+    // Haversine formula for distance calculation
     private double haversine(double lat1, double lon1, double lat2, double lon2) {
-        double R = 6371;
+        double R = 6371; // Earth's radius in kilometers
         double dLat = Math.toRadians(lat2 - lat1);
         double dLon = Math.toRadians(lon2 - lon1);
         double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
                    Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c;
+        return R * c; // Distance in kilometers
     }
 }
