@@ -1,0 +1,93 @@
+openapi: 3.0.3
+info:
+  title: Real-Time Notifications API
+  description: API for managing real-time notifications based on location updates.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local Development Server
+paths:
+  /locations/update:
+    post:
+      summary: Process a location update
+      description: Receives a real-time location update and sends notifications if the user is near a Point of Interest, an intermediate spot, or the destination.
+      operationId: updateLocation
+      tags:
+        - Locations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocationUpdate'
+            example:
+              userId: "user123"
+              latitude: 40.782900
+              longitude: -73.965400
+      responses:
+        '200':
+          description: Location update processed successfully.
+          content:
+            application/json:
+              schema:
+                type: string
+              example: "Location processed successfully."
+        '400':
+          description: Invalid input data.
+          content:
+            application/json:
+              schema:
+                type: string
+              example: "Invalid location update data."
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                type: string
+              example: "Error processing location update."
+
+components:
+  schemas:
+    LocationUpdate:
+      type: object
+      required:
+        - userId
+        - latitude
+        - longitude
+      properties:
+        userId:
+          type: string
+          description: The unique identifier for the user sending the location update.
+          example: "user123"
+        latitude:
+          type: number
+          format: double
+          description: The latitude of the user's current location.
+          example: 40.782900
+        longitude:
+          type: number
+          format: double
+          description: The longitude of the user's current location.
+          example: -73.965400
+    PointOfInterest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the point of interest.
+          example: "Central Park"
+        coordinates:
+          type: array
+          items:
+            type: number
+          description: The coordinates of the POI in [longitude, latitude] format.
+          example: [-73.965355, 40.782865]
+        description:
+          type: string
+          description: A brief description of the POI.
+          example: "A large public park in New York City, USA."
+        category:
+          type: string
+          description: The category of the POI.
+          example: "Park"
