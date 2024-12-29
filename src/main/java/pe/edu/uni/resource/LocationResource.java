@@ -8,10 +8,15 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import java.util.List;
+
 import org.jboss.logging.Logger;
 
 import pe.edu.uni.dto.LocationUpdate;
 import pe.edu.uni.notification.LocationConsumer;
+import pe.edu.uni.service.LocationService;
+import pe.edu.uni.service.NotificationService;
+import pe.edu.uni.service.PoiService;
 
 @ApplicationScoped
 @Path("/locations")
@@ -21,6 +26,16 @@ public class LocationResource {
 
     @Inject
     LocationConsumer locationConsumer;
+
+
+    @Inject
+    NotificationService notificationService;
+
+    @Inject
+    PoiService poiService;
+
+    @Inject
+    LocationService locationService;
 
     @POST
     @Path("/update")
@@ -36,5 +51,15 @@ public class LocationResource {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                            .entity("Error processing location update.").build();
         }
+    }
+
+ @POST
+    @Path("/update2")
+    public Response updateLocationWithNames(LocationUpdate locationUpdate) {
+        List<String> closestPois = locationService.getClosestPois(locationUpdate);
+        if (closestPois.isEmpty()) {
+            return Response.ok("No POIs nearby.").build();
+        }
+        return Response.ok(closestPois).build();
     }
 }

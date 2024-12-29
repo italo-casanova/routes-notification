@@ -4,11 +4,21 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
 
 import org.junit.jupiter.api.Test;
+import jakarta.inject.Inject;
+
+import pe.edu.uni.resource.LocationResource;
+import pe.edu.uni.service.NotificationService;
 
 import static org.hamcrest.CoreMatchers.is;
 
 @QuarkusTest
 public class LocationResourceTest {
+
+    @Inject
+    NotificationService notificationService; // Injected test service
+
+    @Inject
+    LocationResource locationResource; // Class under test
 
     @Test
     public void testLocationUpdateEndpoint() {
@@ -22,3 +32,4 @@ public class LocationResourceTest {
                 .body(is("Location processed successfully."));
     }
 }
+

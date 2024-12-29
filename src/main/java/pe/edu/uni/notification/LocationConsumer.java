@@ -31,10 +31,8 @@ public class LocationConsumer {
     public void processLocationUpdate(LocationUpdate update) {
         LOG.infof("Received location update: %s", update);
 
-        // Notify for nearby POIs
         notifyIfNearPois(update);
 
-        // Retrieve the user's route
         Route route = routeService.getRouteForUser(update.getUserId());
         if (route == null) {
             LOG.warnf("No route found for user %s", update.getUserId());
@@ -66,21 +64,19 @@ public class LocationConsumer {
         }
     }
 
-    // Helper method to determine proximity using the Haversine formula
     private boolean isNear(double lat1, double lon1, double lat2, double lon2) {
         double distance = haversine(lat1, lon1, lat2, lon2);
         return distance <= 0.5; // Within 500 meters
     }
 
-    // Haversine formula for distance calculation
     private double haversine(double lat1, double lon1, double lat2, double lon2) {
-        double R = 6371; // Earth's radius in kilometers
+        double R = 6371;
         double dLat = Math.toRadians(lat2 - lat1);
         double dLon = Math.toRadians(lon2 - lon1);
         double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
                    Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c; // Distance in kilometers
+        return R * c;
     }
 }

@@ -26,6 +26,7 @@ public class NotificationConsumer {
         try {
             LOG.infof("Received message from Kafka: %s", message);
             notificationService.saveNotification(message);
+            notificationService.sendNotification("Unknown", message);
             LOG.infof("Message successfully saved to MongoDB: %s", message);
         } catch (Exception e) {
             LOG.errorf("Error processing message: %s", e.getMessage());
