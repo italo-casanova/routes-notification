@@ -1,4 +1,4 @@
-package pe.edu.uni.notifications;
+package pe.edu.uni.notification;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.reactive.messaging.Channel;

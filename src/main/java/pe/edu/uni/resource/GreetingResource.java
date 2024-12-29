@@ -1,4 +1,4 @@
-package pe.edu.uni;
+package pe.edu.uni.resource;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;

@@ -1,4 +1,4 @@
-package pe.edu.uni.notifications;
+package pe.edu.uni.service;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -20,4 +20,10 @@ public class NotificationService {
                 .append("timestamp", System.currentTimeMillis());
         collection.insertOne(notification);
     }
+
+	public void sendNotification(String userId, String string) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'sendNotification'");
+	}
+
 }

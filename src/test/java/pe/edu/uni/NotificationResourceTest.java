@@ -1,4 +1,3 @@
-
 package pe.edu.uni;
 
 import io.quarkus.test.junit.QuarkusTest;

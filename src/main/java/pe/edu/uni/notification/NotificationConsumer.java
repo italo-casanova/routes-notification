@@ -1,7 +1,10 @@
-package pe.edu.uni.notifications;
+package pe.edu.uni.notification;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+
+import pe.edu.uni.service.NotificationService;
+
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.jboss.logging.Logger;
 
