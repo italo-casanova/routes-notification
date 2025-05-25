@@ -1,12 +1,13 @@
 package pe.edu.uni.service;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import pe.edu.uni.dto.LocationUpdate;
-import pe.edu.uni.dto.PointOfInterest;
-
 import java.util.List;
 import java.util.stream.Collectors;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
+import pe.edu.uni.dto.LocationUpdate;
+import pe.edu.uni.dto.PointOfInterest;
 
 @ApplicationScoped
 public class LocationServiceImp implements LocationService {
